@@ -1,10 +1,10 @@
-import { exec } from 'child_process';
+import { execFile } from 'child_process';
 import { closeMainWindow } from '@raycast/api';
 import { runPowerShellScript } from '@raycast/utils';
 import fs from 'fs/promises';
 import { promisify } from 'util';
 import { extractQRCodeFromImage } from '.';
-const execAsync = promisify(exec);
+const execFileAsync = promisify(execFile);
 
 export interface DisplayInfo {
   X: number;
@@ -144,7 +144,7 @@ export async function scanWindowsQRCodeAcrossDisplays(path: string): Promise<str
     }
 
     // relaunch for progress
-    await execAsync(`start raycast:`).catch(() => {});
+    await execFileAsync('cmd.exe', ['/d', '/s', '/c', 'start', '', 'raycast:']).catch(() => {});
   } catch (error) {
     console.error('Error scanning screens on Windows:', error);
     return undefined;
@@ -165,7 +165,7 @@ interface ExecError extends Error {
 
 async function isProcessRunning(processName: string): Promise<boolean> {
   try {
-    const { stdout } = await execAsync(`tasklist /FI "IMAGENAME eq ${processName}"`);
+    const { stdout } = await execFileAsync('tasklist.exe', ['/FI', `IMAGENAME eq ${processName}`]);
     const isRunning =
       stdout.toLowerCase().includes(processName.toLowerCase()) && !stdout.toLowerCase().startsWith('image name');
     return isRunning;
@@ -186,7 +186,7 @@ async function isProcessRunning(processName: string): Promise<boolean> {
 async function openUriSchemeAndWaitForExit(uri: string, processNames: string[], pollInterval: number = 500) {
   console.log(`Attempting to open URI scheme: ${uri}`);
   return new Promise<void>((resolve, reject) => {
-    execAsync(`start "" "${uri}"`)
+    execFileAsync('cmd.exe', ['/d', '/s', '/c', 'start', '', uri])
       .then(() => {
         console.log(`URI scheme "${uri}" launched. Now monitoring for process exit...`);
         // Do not resolve here, we need to wait for the process to exit.
@@ -267,7 +267,7 @@ export async function selectWindowsQRCodeRegion(path: string): Promise<string | 
     const selectedData = await readClipBoardFile(path);
 
     // Relaunch raycast
-    await execAsync(`start raycast:`).catch(() => {});
+    await execFileAsync('cmd.exe', ['/d', '/s', '/c', 'start', '', 'raycast:']).catch(() => {});
 
     return selectedData;
   } catch (error) {

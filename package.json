@@ -3,7 +3,7 @@
   "name": "one-time-password",
   "title": "One Time Password",
   "description": "Generate time-based one-time passwords",
-  "icon": "icon.png",
+  "icon": "assets/icon.png",
   "author": "almatkai",
   "contributors": [
     "soulevans07",
